@@ -1,0 +1,30 @@
+const fs = require('fs');
+const path = require('path');
+
+// Ensure assets/icons directory exists
+const iconsDir = path.join(__dirname, 'assets', 'icons');
+if (!fs.existsSync(iconsDir)) {
+  fs.mkdirSync(iconsDir, { recursive: true });
+}
+
+// Minimal valid PNG generator (single color terracotta block with PNG headers)
+function createMinimalPNG(width, height) {
+  // We can write an uncompressed PNG or SVG URI embedded PNG buffer
+  // Or simple valid PNG file bytes
+  // For standard PWA compatibility, a standard 1x1 terracotta PNG upscaled or valid PNG chunk
+  const p = Buffer.from([
+    0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, // PNG Signature
+    0x00, 0x00, 0x00, 0x0d, 0x49, 0x48, 0x44, 0x52, // IHDR header
+    0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x01, // 1x1 dimensions
+    0x08, 0x02, 0x00, 0x00, 0x00, 0x90, 0x77, 0x53, 0xde,
+    0x00, 0x00, 0x00, 0x0c, 0x49, 0x44, 0x41, 0x54, // IDAT chunk
+    0x08, 0xd7, 0x63, 0xf8, 0xcf, 0xc0, 0x00, 0x00, 0x03, 0x01, 0x01, 0x00, 0x18, 0xdd, 0x8d, 0xb0,
+    0x00, 0x00, 0x00, 0x00, 0x49, 0x45, 0x4e, 0x44, // IEND chunk
+    0xae, 0x42, 0x60, 0x82
+  ]);
+  return p;
+}
+
+fs.writeFileSync(path.join(iconsDir, 'icon-192.png'), createMinimalPNG(192, 192));
+fs.writeFileSync(path.join(iconsDir, 'icon-512.png'), createMinimalPNG(512, 512));
+console.log('Icons written successfully to assets/icons');
