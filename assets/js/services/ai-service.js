@@ -30,7 +30,7 @@ export const AIService = {
    * Appel à l'endpoint Messages de l'API Anthropic Claude
    */
   async callClaudeAPI(apiKey, model, messageText, customerName, catalog) {
-    const catalogSummary = catalog.map(p => 
+    const catalogSummary = catalog.map(p =>
       `- ${p.name} (Catégorie: ${p.category}, Prix: ${p.priceXOF} FCFA, Tailles: ${p.sizes.join('/')}, Stock: ${JSON.stringify(p.stock)}, Délai: ${p.deliveryDelay})`
     ).join('\n');
 
@@ -69,7 +69,7 @@ Format de réponse OBLIGATOIRE : Tu dois répondre UNIQUEMENT par un objet JSON 
     if (!response.ok) throw new Error(`Erreur API ${response.status}`);
     const data = await response.json();
     const contentText = data.content[0]?.text || '';
-    
+
     // Extraire et parser l'objet JSON retourné par Claude
     const jsonMatch = contentText.match(/\{[\s\S]*\}/);
     if (jsonMatch) {
@@ -85,7 +85,7 @@ Format de réponse OBLIGATOIRE : Tu dois répondre UNIQUEMENT par un objet JSON 
     const lower = text.toLowerCase();
 
     // Rechercher le produit correspondant dans le catalogue
-    const matchedProduct = catalog.find(p => 
+    const matchedProduct = catalog.find(p =>
       lower.includes(p.name.toLowerCase()) ||
       (p.category === 'habits' && (lower.includes('robe') || lower.includes('bazin') || lower.includes('chemise') || lower.includes('wax'))) ||
       (p.category === 'chaussures' && (lower.includes('talon') || lower.includes('sandale') || lower.includes('chaussure'))) ||
@@ -104,13 +104,13 @@ Format de réponse OBLIGATOIRE : Tu dois répondre UNIQUEMENT par un objet JSON 
       urgencyLevel = "haute";
       intent = `Demande de tarif pour ${matchedProduct.name}`;
       suggestedResponse = `Bonjour ${customerName} ! 😊 Le prix de notre ${matchedProduct.name} est de ${matchedProduct.priceXOF.toLocaleString('fr-FR')} FCFA. ${matchedProduct.deliveryDelay}. Souhaitez-vous passer commande aujourd'hui ?`;
-    } 
+    }
     else if (lower.includes('taille') || lower.includes('pointure') || lower.includes('stock') || lower.includes('avez-vous')) {
       category = "disponibilite";
       urgencyScore = 4;
       urgencyLevel = "haute";
       intent = `Vérification du stock et des tailles pour ${matchedProduct.name}`;
-      
+
       const availableSizes = Object.entries(matchedProduct.stock)
         .filter(([_, qty]) => qty > 0)
         .map(([size]) => size);

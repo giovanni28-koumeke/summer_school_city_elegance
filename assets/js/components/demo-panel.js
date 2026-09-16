@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CITY ELEGANCE — LIVE DEMO PANEL (JURY SIMULATION DRAWER)
+   CITY ELEGANCE — PANNEAU SIMULATEUR DE MESSAGES EN DIRECT
    ========================================================================== */
 
 import { state } from '../state.js';
@@ -20,7 +20,7 @@ export function initDemoPanel() {
 
   if (!drawer || !form) return;
 
-  // Open & Close Handlers
+  // Gestionnaires d'ouverture et fermeture
   if (btnOpenHeader) {
     btnOpenHeader.addEventListener('click', () => drawer.classList.add('active'));
   }
@@ -28,13 +28,13 @@ export function initDemoPanel() {
     btnClose.addEventListener('click', () => drawer.classList.remove('active'));
   }
 
-  // Presets definition
+  // Scénarios de tests rapides
   const PRESETS = {
     'wax-prix': {
       name: "Akossiwa Dovi",
       phone: "+228 90 99 88 77",
       channel: "whatsapp",
-      text: "Bonjour City Elegance, s'il vous plaît la Robe Wax Hollandais bleu est à combien ? Vous livrez à Gbadago aujourd'hui ?",
+      text: "Bonjour, s'il vous plaît la Robe Wax Hollandais bleu est à combien ? Vous livrez à Gbadago aujourd'hui ?",
       isAudio: false
     },
     'talon-taille': {
@@ -48,7 +48,7 @@ export function initDemoPanel() {
       name: "Klassou Kodjo",
       phone: "+228 91 22 33 44",
       channel: "whatsapp",
-      text: "Bonjour City Elegance, est-ce que le livreur peut passer à Bè vers 14h ? Et c'est quel numéro T-Money pour payer ?",
+      text: "Bonjour, est-ce que le livreur peut passer à Bè vers 14h ? Et c'est quel numéro T-Money pour payer ?",
       isAudio: true
     },
     'pantalon-homme': {
@@ -74,7 +74,7 @@ export function initDemoPanel() {
     });
   });
 
-  // Handle Form Submission (Inject live message into inbox pipeline)
+  // Soumission du formulaire d'injection de message
   form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -86,14 +86,13 @@ export function initDemoPanel() {
 
     if (!text) return;
 
-    // Show loading indicator on submit button
     const submitBtn = form.querySelector('button[type="submit"]');
     const originalBtnText = submitBtn.innerHTML;
     submitBtn.innerHTML = `<span>⚡ IA en cours de classification...</span>`;
     submitBtn.disabled = true;
 
     try {
-      // Run AI Classification (Claude API or Local Heuristic)
+      // Classification IA (Claude API ou Moteur Local)
       const aiResult = await AIService.classifyAndSuggest(text, name, channel);
 
       const newReq = {
@@ -131,15 +130,15 @@ export function initDemoPanel() {
         ]
       };
 
-      // Add to reactive store
+      // Ajout dans le store réactif
       state.addRequest(newReq);
       state.setActiveView('inbox');
 
-      // Close drawer & notify
+      // Fermeture du tiroir et notification
       drawer.classList.remove('active');
       showToast(`🔥 Nouveau message ${channel.toUpperCase()} injecté et classifié par l'IA !`);
     } catch (err) {
-      console.error('Failed to inject demo message', err);
+      console.error('Échec de la simulation de message', err);
       showToast('Erreur lors de la simulation du message');
     } finally {
       submitBtn.innerHTML = originalBtnText;

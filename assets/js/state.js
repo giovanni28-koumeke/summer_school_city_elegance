@@ -1,12 +1,15 @@
 /* ==========================================================================
-   CITY ELEGANCE — STORE DE DONNÉES CENTRALISÉ ET RÉACTIF
+   CITY ELEGANCE — STORE DE DONNÉES CENTRALISÉ ET RÉACTIF MULTI-PME
    ========================================================================== */
 
 import { StorageService } from './services/storage-service.js';
+import { AuthService } from './services/auth-service.js';
+import { INITIAL_REQUESTS } from './mock-data.js';
 
 class StateStore extends EventTarget {
   constructor() {
     super();
+    this.currentSession = null;
     this.requests = [];
     this.catalog = [];
     this.customers = [];
@@ -22,19 +25,59 @@ class StateStore extends EventTarget {
     this.loadState();
   }
 
-  // Chargement de l'état initial depuis le localStorage
+  // Chargement de la session active et des données d'entreprise
   loadState() {
-    this.requests = StorageService.getRequests();
-    this.catalog = StorageService.getCatalog();
-    this.customers = StorageService.getCustomers();
-    this.settings = StorageService.getSettings();
+    this.currentSession = AuthService.getCurrentSession();
+    if (this.currentSession) {
+      this.requests = StorageService.getRequests();
+      this.catalog = StorageService.getCatalog();
+      this.customers = StorageService.getCustomers();
+      this.settings = StorageService.getSettings();
 
-    // Calcul automatique du dépasser de délai SLA (> 30 min sans réponse pour un nouveau message)
-    this.updateSLAStatus();
+      // Sécurité si requests est vide pour City Elegance
+      if (this.requests.length === 0 && this.currentSession.companyId === 'comp_city_elegance') {
+        this.requests = [...INITIAL_REQUESTS];
+        StorageService.saveRequests(this.requests);
+      }
 
-    if (this.requests.length > 0 && !this.selectedRequestId) {
-      this.selectedRequestId = this.requests[0].id;
+      this.updateSLAStatus();
+
+      if (this.requests.length > 0 && !this.selectedRequestId) {
+        this.selectedRequestId = this.requests[0].id;
+      }
+    } else {
+      this.requests = [];
+      this.catalog = [];
+      this.customers = [];
+      this.settings = {};
+      this.selectedRequestId = null;
     }
+  }
+
+  // Mettre à jour l'état lors de la connexion ou déconnexion
+  reloadState() {
+    this.selectedRequestId = null;
+    this.loadState();
+    this.notifyChange();
+  }
+
+  // Déconnexion de l'utilisateur
+  logout() {
+    AuthService.logout();
+    this.currentSession = null;
+    this.reloadState();
+    this.setActiveView('login');
+  }
+
+  // Mise à jour du profil de l'entreprise connectée
+  updateCompanyProfile(profileData) {
+    if (!this.currentSession) return;
+    const res = AuthService.updateProfile(this.currentSession.companyId, profileData);
+    if (res.success) {
+      this.currentSession = AuthService.getCurrentSession();
+      this.notifyChange();
+    }
+    return res;
   }
 
   // Recalcul des alertes SLA en fonction de l'horodatage actuel
@@ -54,7 +97,10 @@ class StateStore extends EventTarget {
   // Notification des composants suite à un changement d'état
   notifyChange() {
     this.updateSLAStatus();
-    StorageService.saveRequests(this.requests);
+    if (this.currentSession) {
+      StorageService.saveRequests(this.requests);
+      StorageService.saveCatalog(this.catalog);
+    }
     this.dispatchEvent(new CustomEvent('state-changed', { detail: this }));
   }
 
@@ -75,7 +121,7 @@ class StateStore extends EventTarget {
   }
 
   addRequest(newRequest) {
-    this.requests.unshift(newRequest); // Ajouter en tête de liste
+    this.requests.unshift(newRequest);
     this.selectedRequestId = newRequest.id;
     this.notifyChange();
   }
@@ -88,7 +134,6 @@ class StateStore extends EventTarget {
     }
   }
 
-  // Ajouter une réponse de l'agent dans l'historique
   addAgentResponse(requestId, responseText) {
     const req = this.requests.find(r => r.id === requestId);
     if (req) {
@@ -104,46 +149,34 @@ class StateStore extends EventTarget {
     }
   }
 
-  // Annuler et supprimer la dernière réponse envoyée par l'agent (Retour en arrière)
   removeLastAgentResponse(requestId) {
     const req = this.requests.find(r => r.id === requestId);
     if (req && req.messagesHistory.length > 0) {
-      // Trouver l'indice du dernier message agent
       const lastAgentIdx = req.messagesHistory.map(m => m.sender).lastIndexOf('agent');
       if (lastAgentIdx !== -1) {
         req.messagesHistory.splice(lastAgentIdx, 1);
-        
-        // Mettre à jour le dernier message affiché
         const remainingMsgs = req.messagesHistory;
         req.lastMessage = remainingMsgs.length > 0 ? remainingMsgs[remainingMsgs.length - 1].text : '';
-        
-        // Si aucun message agent n'est présent, repasser le statut à "nouveau"
         const hasAgentMsg = remainingMsgs.some(m => m.sender === 'agent');
         if (!hasAgentMsg) {
           req.status = 'nouveau';
         }
-        
         this.notifyChange();
       }
     }
   }
 
-  // Filtrage dynamique des demandes clients
   getFilteredRequests() {
     return this.requests.filter(req => {
-      // Filtre par canal
       if (this.filters.channel !== 'all' && req.channel !== this.filters.channel) {
         return false;
       }
-      // Filtre par statut pipeline
       if (this.filters.status !== 'all' && req.status !== this.filters.status) {
         return false;
       }
-      // Filtre par urgence
       if (this.filters.urgency === 'high' && (req.urgencyLevel !== 'haute' && req.urgencyLevel !== 'critique')) {
         return false;
       }
-      // Recherche textuelle
       if (this.filters.searchQuery.trim() !== '') {
         const query = this.filters.searchQuery.toLowerCase();
         const matchName = req.customerName.toLowerCase().includes(query);

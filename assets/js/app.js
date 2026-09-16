@@ -1,9 +1,13 @@
 /* ==========================================================================
-   CITY ELEGANCE — MAIN APPLICATION ENTRY POINT & ROUTER
+   CITY ELEGANCE & PME — POINT D'ENTRÉE ET ROUTEUR MULTI-ENTREPRISES
    ========================================================================== */
 
 import { state } from './state.js';
 import { StorageService } from './services/storage-service.js';
+import { AuthService } from './services/auth-service.js';
+import { initLoginView } from './components/login-view.js';
+import { initProfileView } from './components/profile-view.js';
+import { initBurgerMenu } from './components/burger-menu.js';
 import { initInboxView } from './components/inbox-view.js';
 import { initChatView } from './components/chat-view.js';
 import { initCatalogModal } from './components/catalog-modal.js';
@@ -11,36 +15,63 @@ import { initAnalyticsView } from './components/analytics-view.js';
 import { initDemoPanel } from './components/demo-panel.js';
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('Initializing City Elegance Application...');
+  console.log('Initialisation de l\'application PME Omnicanale...');
 
-  // 1. Initialize Components
+  // 1. Initialisation de l'authentification et de la session active
+  AuthService.init();
+  state.loadState();
+
+  // 2. Initialisation de tous les composants UI et écouteurs d'événements
+  initLoginView();
+  initProfileView();
+  initBurgerMenu();
   initInboxView();
   initChatView();
   initCatalogModal();
   initAnalyticsView();
   initDemoPanel();
 
-  // 2. Setup App Navigation Tabs
-  const navTabs = document.querySelectorAll('.nav-tab');
-  const viewSections = document.querySelectorAll('.view-section');
+  // 3. Mise à jour de l'interface selon le statut d'authentification
+  function updateAuthUI() {
+    const session = state.currentSession;
+    const authElements = document.querySelectorAll('.auth-required');
+    const headerTitle = document.getElementById('header-company-title');
+    const headerSubtitle = document.getElementById('header-company-subtitle');
 
-  navTabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const viewName = tab.getAttribute('data-view');
-      state.setActiveView(viewName);
-    });
-  });
+    if (!session) {
+      // Utilisateur non connecté -> afficher la vue login
+      authElements.forEach(el => el.classList.add('hidden'));
+      if (headerTitle) headerTitle.textContent = 'Inbox Omnicanale PME';
+      if (headerSubtitle) headerSubtitle.textContent = 'Connexion & Accès Entreprise';
+      state.setActiveView('login');
+    } else {
+      // Utilisateur connecté -> afficher les boutons et le menu burger
+      authElements.forEach(el => el.classList.remove('hidden'));
+      if (headerTitle) headerTitle.textContent = session.companyName || 'Mon Entreprise';
+      if (headerSubtitle) headerSubtitle.textContent = `${session.industry || 'PME'} • ${session.city || 'Lomé, Togo'}`;
 
-  state.addEventListener('view-changed', (e) => {
-    const activeView = e.detail.view;
-    navTabs.forEach(tab => {
-      if (tab.getAttribute('data-view') === activeView) {
-        tab.classList.add('active');
-      } else {
-        tab.classList.remove('active');
+      // Si l'utilisateur est sur login mais possède une session, le diriger sur inbox
+      if (state.activeView === 'login') {
+        state.setActiveView('inbox');
+      }
+    }
+  }
+
+  // 4. Gestion de la déconnexion
+  const btnLogout = document.getElementById('btn-logout');
+  if (btnLogout) {
+    btnLogout.addEventListener('click', () => {
+      if (confirm('Voulez-vous vraiment vous déconnecter de votre espace entreprise ?')) {
+        state.logout();
+        showToast('Vous avez été déconnecté avec succès.');
       }
     });
+  }
 
+  // 5. Bascule dynamique des vues selon state.activeView
+  const viewSections = document.querySelectorAll('.view-section');
+  state.addEventListener('view-changed', (e) => {
+    const activeView = e.detail.view;
     viewSections.forEach(section => {
       if (section.id === `view-${activeView}`) {
         section.classList.add('active');
@@ -50,7 +81,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
-  // 3. Setup Settings View (Claude API Key)
+  // Écouter les changements d'état global
+  state.addEventListener('state-changed', updateAuthUI);
+  
+  // Forcer la notification initiale pour remplir l'inbox et activer les réactivités des boutons
+  state.notifyChange();
+  updateAuthUI();
+
+  // 6. Configuration de l'API IA
   const apiKeyInput = document.getElementById('api-key-input');
   const modelSelect = document.getElementById('model-select');
   const btnSaveSettings = document.getElementById('btn-save-settings');
@@ -81,7 +119,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // 4. Register PWA Service Worker
+  // 7. Enregistrement du Service Worker PWA
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js')
       .then(reg => console.log('[PWA] Service Worker registered successfully', reg.scope))

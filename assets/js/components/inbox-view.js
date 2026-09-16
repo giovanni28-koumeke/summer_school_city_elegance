@@ -22,7 +22,7 @@ export function initInboxView() {
 
     // Mise à jour du compteur de nouveaux messages non lus
     const newCount = allRequests.filter(r => r.status === 'nouveau').length;
-    unreadBadge.textContent = newCount;
+    if (unreadBadge) unreadBadge.textContent = newCount;
 
     // Mise à jour de la bannière d'alerte SLA (> 30 min sans réponse)
     const slaOverdueCount = allRequests.filter(r => r.slaOverdue).length;
@@ -160,7 +160,7 @@ function getStatusLabel(status) {
 
 function escapeHTML(str) {
   if (!str) return '';
-  return str.replace(/[&<>'"]/g, 
+  return str.replace(/[&<>'"]/g,
     tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
   );
 }

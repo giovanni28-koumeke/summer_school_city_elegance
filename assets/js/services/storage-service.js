@@ -1,92 +1,127 @@
 /* ==========================================================================
-   CITY ELEGANCE — SERVICE DE STOCKAGE (COUCHE ABSTRAITE LOCALSTORAGE)
+   CITY ELEGANCE — SERVICE DE STOCKAGE LOCAL MULTI-ENTREPRISE (RECHARGEMENT GARANTI)
    ========================================================================== */
 
 import { INITIAL_CATALOG, INITIAL_CUSTOMERS, INITIAL_REQUESTS } from '../mock-data.js';
-
-// Clés d'accès au stockage local
-const STORAGE_KEYS = {
-  REQUESTS: 'city_elegance_requests_v1',
-  CATALOG: 'city_elegance_catalog_v1',
-  CUSTOMERS: 'city_elegance_customers_v1',
-  SETTINGS: 'city_elegance_settings_v1'
-};
+import { AuthService } from './auth-service.js';
 
 export const StorageService = {
-  // Initialisation par défaut du stockage s'il est vide
+  getKey(resourceName) {
+    const companyId = AuthService.getCurrentCompanyId();
+    return `city_elegance_${companyId}_${resourceName}_v2`;
+  },
+
   init() {
-    if (!localStorage.getItem(STORAGE_KEYS.CATALOG)) {
-      localStorage.setItem(STORAGE_KEYS.CATALOG, JSON.stringify(INITIAL_CATALOG));
+    const companyId = AuthService.getCurrentCompanyId();
+    const catalogKey = this.getKey('catalog');
+    const customersKey = this.getKey('customers');
+    const requestsKey = this.getKey('requests');
+    const settingsKey = this.getKey('settings');
+
+    // Pour le compte démo "City Elegance", charger les 8 demandes de démarrage
+    if (companyId === 'comp_city_elegance') {
+      const existingReqs = localStorage.getItem(requestsKey);
+      if (!existingReqs || existingReqs === '[]') {
+        localStorage.setItem(requestsKey, JSON.stringify(INITIAL_REQUESTS));
+      }
+      const existingCat = localStorage.getItem(catalogKey);
+      if (!existingCat || existingCat === '[]') {
+        localStorage.setItem(catalogKey, JSON.stringify(INITIAL_CATALOG));
+      }
+      const existingCust = localStorage.getItem(customersKey);
+      if (!existingCust || existingCust === '[]') {
+        localStorage.setItem(customersKey, JSON.stringify(INITIAL_CUSTOMERS));
+      }
     }
-    if (!localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) {
-      localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.REQUESTS)) {
-      localStorage.setItem(STORAGE_KEYS.REQUESTS, JSON.stringify(INITIAL_REQUESTS));
-    }
-    if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
-      localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify({
+
+    if (!localStorage.getItem(settingsKey)) {
+      localStorage.setItem(settingsKey, JSON.stringify({
         apiKey: '',
         selectedModel: 'local-fallback'
       }));
     }
   },
 
-  // Récupérer la liste des demandes clients
   getRequests() {
     this.init();
+    const key = this.getKey('requests');
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.REQUESTS)) || [];
+      const data = JSON.parse(localStorage.getItem(key));
+      if ((!data || data.length === 0) && AuthService.getCurrentCompanyId() === 'comp_city_elegance') {
+        localStorage.setItem(key, JSON.stringify(INITIAL_REQUESTS));
+        return INITIAL_REQUESTS;
+      }
+      return data || [];
     } catch (e) {
-      console.error('Échec de la lecture des demandes depuis le localStorage', e);
       return INITIAL_REQUESTS;
     }
   },
 
-  // Sauvegarder la liste des demandes
   saveRequests(requests) {
-    localStorage.setItem(STORAGE_KEYS.REQUESTS, JSON.stringify(requests));
+    const key = this.getKey('requests');
+    localStorage.setItem(key, JSON.stringify(requests));
   },
 
-  // Récupérer le catalogue des produits
   getCatalog() {
     this.init();
+    const key = this.getKey('catalog');
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.CATALOG)) || [];
+      const data = JSON.parse(localStorage.getItem(key));
+      if ((!data || data.length === 0) && AuthService.getCurrentCompanyId() === 'comp_city_elegance') {
+        localStorage.setItem(key, JSON.stringify(INITIAL_CATALOG));
+        return INITIAL_CATALOG;
+      }
+      return data || [];
     } catch (e) {
       return INITIAL_CATALOG;
     }
   },
 
-  // Récupérer la liste des clients
+  saveCatalog(catalog) {
+    const key = this.getKey('catalog');
+    localStorage.setItem(key, JSON.stringify(catalog));
+  },
+
   getCustomers() {
     this.init();
+    const key = this.getKey('customers');
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.CUSTOMERS)) || [];
+      const data = JSON.parse(localStorage.getItem(key));
+      if ((!data || data.length === 0) && AuthService.getCurrentCompanyId() === 'comp_city_elegance') {
+        localStorage.setItem(key, JSON.stringify(INITIAL_CUSTOMERS));
+        return INITIAL_CUSTOMERS;
+      }
+      return data || [];
     } catch (e) {
       return INITIAL_CUSTOMERS;
     }
   },
 
-  // Récupérer la configuration de l'application (Clé API et modèle)
   getSettings() {
     this.init();
+    const key = this.getKey('settings');
     try {
-      return JSON.parse(localStorage.getItem(STORAGE_KEYS.SETTINGS)) || { apiKey: '', selectedModel: 'local-fallback' };
+      return JSON.parse(localStorage.getItem(key)) || { apiKey: '', selectedModel: 'local-fallback' };
     } catch (e) {
       return { apiKey: '', selectedModel: 'local-fallback' };
     }
   },
 
-  // Sauvegarder la configuration de l'application
   saveSettings(settings) {
-    localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+    const key = this.getKey('settings');
+    localStorage.setItem(key, JSON.stringify(settings));
   },
 
-  // Réinitialiser les données au statut de démo initial
   resetAllData() {
-    localStorage.setItem(STORAGE_KEYS.CATALOG, JSON.stringify(INITIAL_CATALOG));
-    localStorage.setItem(STORAGE_KEYS.CUSTOMERS, JSON.stringify(INITIAL_CUSTOMERS));
-    localStorage.setItem(STORAGE_KEYS.REQUESTS, JSON.stringify(INITIAL_REQUESTS));
+    const companyId = AuthService.getCurrentCompanyId();
+    if (companyId === 'comp_city_elegance') {
+      localStorage.setItem(this.getKey('catalog'), JSON.stringify(INITIAL_CATALOG));
+      localStorage.setItem(this.getKey('customers'), JSON.stringify(INITIAL_CUSTOMERS));
+      localStorage.setItem(this.getKey('requests'), JSON.stringify(INITIAL_REQUESTS));
+    } else {
+      localStorage.setItem(this.getKey('catalog'), JSON.stringify([]));
+      localStorage.setItem(this.getKey('customers'), JSON.stringify([]));
+      localStorage.setItem(this.getKey('requests'), JSON.stringify([]));
+    }
   }
 };

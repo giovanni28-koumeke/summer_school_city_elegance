@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CITY ELEGANCE — STYLES DES COMPOSANTS ET VUES (FRANÇAIS)
+   CITY ELEGANCE & PME — STYLES DES COMPOSANTS ET VUES (MULTI-PME)
    ========================================================================== */
 
 /* ==========================================================================
@@ -83,8 +83,9 @@
   font-size: 1.25rem;
   cursor: pointer;
   color: var(--color-text-muted);
-  width: 32px;
-  height: 32px;
+  width: 36px;
+  height: 36px;
+  padding: 0;
   border-radius: var(--radius-sm);
   display: flex;
   align-items: center;
@@ -95,7 +96,6 @@
   color: var(--color-text-main);
 }
 
-/* Style unifié des formulaires */
 .form-control {
   width: 100%;
   padding: 0.65rem 0.9rem;
@@ -145,7 +145,251 @@
 }
 
 /* ==========================================================================
-   2. INBOX LAYOUT ET BARRE LATÉRALE
+   2. ÉCRAN DE CONNEXION ET INSCRIPTION (LOGIN VIEW)
+   ========================================================================== */
+
+.login-wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: calc(100vh - 120px);
+  padding: 1.5rem 1rem;
+  background-color: var(--color-bg);
+}
+
+.login-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  width: 480px;
+  max-width: 100%;
+  padding: 2rem;
+  box-shadow: var(--shadow-md);
+  display: flex;
+  flex-direction: column;
+}
+
+.login-brand {
+  text-align: center;
+  margin-bottom: 1.25rem;
+}
+.login-logo {
+  font-size: 2.5rem;
+  margin-bottom: 0.25rem;
+}
+.login-brand h2 {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  line-height: 1.25;
+}
+.login-brand p {
+  font-size: 0.825rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.demo-credentials-box {
+  background-color: var(--color-primary-light);
+  border: 1px solid #FDBA74;
+  border-radius: var(--radius-md);
+  padding: 0.85rem;
+  margin-bottom: 1.25rem;
+}
+.demo-badge {
+  display: inline-block;
+  background-color: var(--color-primary);
+  color: #fff;
+  font-size: 0.675rem;
+  font-weight: 800;
+  padding: 0.15rem 0.5rem;
+  border-radius: var(--radius-full);
+}
+
+.auth-tabs {
+  display: flex;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 1.25rem;
+}
+.auth-tab {
+  flex: 1;
+  background: none;
+  border: none;
+  padding: 0.6rem 0.2rem;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-muted);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: var(--transition-fast);
+}
+.auth-tab:hover {
+  color: var(--color-primary);
+}
+.auth-tab.active {
+  color: var(--color-primary);
+  border-bottom-color: var(--color-primary);
+}
+
+.auth-form {
+  display: none;
+  flex-direction: column;
+}
+.auth-form.active {
+  display: flex;
+}
+
+.auth-error {
+  background-color: #FEF2F2;
+  border: 1px solid #FCA5A5;
+  color: #991B1B;
+  padding: 0.5rem 0.75rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8rem;
+  margin-bottom: 0.75rem;
+}
+.auth-error.hidden { display: none; }
+
+.auth-required.hidden { display: none !important; }
+.app-nav.hidden { display: none !important; }
+
+/* ==========================================================================
+   3. MENU BURGER LATÉRAL (DRAWER)
+   ========================================================================== */
+
+.burger-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: rgba(28, 25, 23, 0.5);
+  backdrop-filter: blur(3px);
+  z-index: 250;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
+}
+.burger-overlay.active {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.burger-drawer {
+  position: fixed;
+  top: 0; left: 0; bottom: 0;
+  width: 320px;
+  max-width: 85vw;
+  background-color: var(--color-surface);
+  border-right: 1px solid var(--color-border);
+  z-index: 260;
+  display: flex;
+  flex-direction: column;
+  box-shadow: var(--shadow-lg);
+  transform: translateX(-100%);
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.burger-drawer.active {
+  transform: translateX(0);
+}
+
+.burger-drawer-header {
+  padding: 1.25rem 1rem;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background-color: var(--color-primary-light);
+}
+
+.burger-user-profile {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+.burger-avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  background-color: var(--color-primary);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.burger-user-info h3 {
+  font-size: 0.95rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+  line-height: 1.2;
+}
+.burger-user-info span {
+  font-size: 0.75rem;
+  color: var(--color-text-muted);
+}
+
+.burger-nav-list {
+  display: flex;
+  flex-direction: column;
+  padding: 0.75rem 0;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.burger-nav-item {
+  background: none;
+  border: none;
+  padding: 0.85rem 1.25rem;
+  font-family: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--color-text-main);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  text-align: left;
+  border-left: 4px solid transparent;
+  transition: var(--transition-fast);
+  position: relative;
+}
+.burger-nav-item svg {
+  color: var(--color-text-muted);
+  transition: var(--transition-fast);
+}
+.burger-nav-item:hover {
+  background-color: var(--color-bg);
+  color: var(--color-primary);
+}
+.burger-nav-item:hover svg {
+  color: var(--color-primary);
+}
+
+.burger-nav-item.active {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  border-left-color: var(--color-primary);
+  font-weight: 700;
+}
+.burger-nav-item.active svg {
+  color: var(--color-primary);
+}
+
+.burger-logout-item {
+  margin-top: auto;
+  border-top: 1px solid var(--color-border);
+  color: var(--color-urgent);
+}
+.burger-logout-item svg {
+  color: var(--color-urgent);
+}
+.burger-logout-item:hover {
+  background-color: #FEF2F2;
+  color: #B91C1C;
+}
+
+/* ==========================================================================
+   4. INBOX LAYOUT ET BARRE LATÉRALE
    ========================================================================== */
 
 .inbox-layout {
@@ -165,7 +409,6 @@
   overflow: hidden;
 }
 
-/* Bannière d'alerte SLA */
 .sla-banner {
   background-color: #FEF2F2;
   border-bottom: 1px solid #FCA5A5;
@@ -179,7 +422,6 @@
 }
 .sla-banner.hidden { display: none; }
 
-/* Contrôles de filtres */
 .inbox-controls {
   padding: 0.85rem;
   border-bottom: 1px solid var(--color-border);
@@ -201,7 +443,6 @@
   pointer-events: none;
 }
 
-/* Puces de filtrage par canal */
 .filter-chips {
   display: flex;
   gap: 0.35rem;
@@ -234,7 +475,6 @@
 .chip-ig.active { background-color: var(--color-ig); border-color: var(--color-ig); }
 .chip-urgent.active { background-color: var(--color-urgent); border-color: var(--color-urgent); }
 
-/* Onglets de filtrage par statut */
 .status-tabs {
   display: flex;
   border-radius: var(--radius-md);
@@ -260,7 +500,6 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Liste défilante des cartes de demandes */
 .requests-list {
   flex: 1;
   overflow-y: auto;
@@ -314,6 +553,7 @@
   font-size: 0.65rem;
   font-weight: 800;
   color: #fff;
+  flex-shrink: 0;
 }
 .badge-whatsapp { background-color: var(--color-wa); }
 .badge-facebook { background-color: var(--color-fb); }
@@ -361,10 +601,15 @@
   padding: 0.1rem 0.4rem;
   border-radius: var(--radius-sm);
   background-color: var(--color-bg);
+  border: 1px solid transparent;
 }
+.status-pill.status-nouveau { background-color: #EFF6FF; color: var(--color-nouveau); border-color: #BFDBFE; }
+.status-pill.status-en_cours { background-color: var(--color-medium-bg); color: var(--color-medium); border-color: #FDE68A; }
+.status-pill.status-converti { background-color: var(--color-low-bg); color: var(--color-low); border-color: #A7F3D0; }
+.status-pill.status-perdu { background-color: #F3F4F6; color: var(--color-perdu); border-color: #E5E7EB; }
 
 /* ==========================================================================
-   3. VUE DE CONVERSATION ET CARTE IA
+   5. VUE DE CONVERSATION ET CARTE IA
    ========================================================================== */
 
 .chat-container {
@@ -440,7 +685,6 @@
   gap: 1rem;
 }
 
-/* Bulles de conversation */
 .message-bubble {
   max-width: 80%;
   padding: 0.85rem 1.1rem;
@@ -471,7 +715,6 @@
   text-align: right;
 }
 
-/* Boîte du lecteur audio */
 .audio-player-box {
   display: flex;
   align-items: center;
@@ -498,14 +741,13 @@
   font-size: 0.825rem;
   font-style: italic;
   color: #166534;
-  background-color: rgba(255,255,255,0.75);
+  background-color: rgba(255, 255, 255, 0.75);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
   margin-top: 0.35rem;
   border-left: 3px solid var(--color-wa);
 }
 
-/* Carte de Réponse Suggérée par IA */
 .ai-suggestion-card {
   background-color: var(--color-surface);
   border: 2px solid #FDBA74;
@@ -563,7 +805,6 @@
   line-height: 1.45;
 }
 
-/* État grisé une fois la réponse validée par l'agent */
 .ai-suggestion-card.validated {
   background-color: #F9FAFB;
   border-color: #E5E7EB;
@@ -596,7 +837,7 @@
 }
 
 /* ==========================================================================
-   4. PAGE CONFIGURATION ET PARAMÈTRES IA (REVISITÉ)
+   6. PAGE CONFIGURATION ET PARAMÈTRES IA
    ========================================================================== */
 
 .settings-wrapper {
@@ -661,7 +902,7 @@
 }
 
 /* ==========================================================================
-   5. TABLEAU DE BORD ANALYTICS ET MODALS
+   7. TABLEAU DE BORD ANALYTICS ET MODALS
    ========================================================================== */
 
 .analytics-container {
@@ -706,8 +947,8 @@
   color: var(--color-low);
 }
 
-/* Overlay des Modals et Tiroirs */
-.drawer-overlay, .modal-overlay {
+.drawer-overlay,
+.modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
   background-color: rgba(28, 25, 23, 0.5);
@@ -719,7 +960,8 @@
   pointer-events: none;
   transition: opacity 0.25s ease;
 }
-.drawer-overlay.active, .modal-overlay.active {
+.drawer-overlay.active,
+.modal-overlay.active {
   opacity: 1;
   pointer-events: auto;
 }
@@ -784,7 +1026,6 @@
   color: var(--color-primary);
 }
 
-/* Modal Catalogue */
 .modal-overlay {
   justify-content: center;
   align-items: center;
@@ -836,7 +1077,6 @@
   border-radius: var(--radius-sm);
 }
 
-/* Notifications Toast */
 .toast-container {
   position: fixed;
   bottom: 1.5rem;
@@ -856,6 +1096,51 @@
   animation: slideIn 0.3s ease;
 }
 
-/* Animations */
-@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-@keyframes slideIn { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideIn {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+/* ==========================================================================
+   8. MEDIA QUERIES & RESPONSIVE DESIGN
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .inbox-layout {
+    grid-template-columns: 1fr;
+    height: auto;
+    min-height: calc(100vh - 70px);
+  }
+
+  .login-card {
+    padding: 1.25rem;
+  }
+
+  .chat-header {
+    padding: 0.75rem 0.85rem;
+  }
+
+  .ai-suggestion-card {
+    margin: 0.75rem 0.5rem;
+    padding: 0.85rem;
+  }
+
+  .ai-actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .ai-actions .btn {
+    width: 100%;
+  }
+
+  .settings-wrapper,
+  .analytics-container {
+    padding: 1rem 0.75rem;
+  }
+}
