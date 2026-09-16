@@ -1,16 +1,16 @@
 /* ==========================================================================
-   CITY ELEGANCE — COMPONENTS & LAYOUT CSS
+   CITY ELEGANCE — STYLES DES COMPOSANTS ET VUES (FRANÇAIS)
    ========================================================================== */
 
 /* ==========================================================================
-   1. BUTTONS & INPUTS
+   1. BOUTONS ET CHAMPS DE FORMULAIRE REVISITÉS
    ========================================================================== */
 
 .btn {
   font-family: inherit;
   font-size: 0.875rem;
   font-weight: 600;
-  padding: 0.55rem 1.1rem;
+  padding: 0.6rem 1.25rem;
   border-radius: var(--radius-md);
   border: 1px solid transparent;
   cursor: pointer;
@@ -19,6 +19,7 @@
   justify-content: center;
   gap: 0.5rem;
   transition: var(--transition-fast);
+  text-decoration: none;
 }
 
 .btn-primary {
@@ -51,6 +52,26 @@
   background-color: var(--color-urgent);
   color: var(--color-text-inverse);
 }
+.btn-danger:hover {
+  background-color: #B91C1C;
+}
+
+.btn-undo {
+  background-color: #F3F4F6;
+  border: 1px solid #D1D5DB;
+  color: #374151;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+.btn-undo:hover {
+  background-color: #E5E7EB;
+  color: #111827;
+}
+
+.btn-sm {
+  padding: 0.4rem 0.85rem;
+  font-size: 0.8rem;
+}
 
 .btn-block {
   width: 100%;
@@ -74,8 +95,57 @@
   color: var(--color-text-main);
 }
 
+/* Style unifié des formulaires */
+.form-control {
+  width: 100%;
+  padding: 0.65rem 0.9rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  font-family: inherit;
+  font-size: 0.875rem;
+  color: var(--color-text-main);
+  background-color: var(--color-surface);
+  outline: none;
+  transition: var(--transition-fast);
+}
+.form-control:focus {
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.15);
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-bottom: 1.1rem;
+}
+.form-group label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.form-help {
+  font-size: 0.775rem;
+  color: var(--color-text-muted);
+  margin-top: 0.15rem;
+}
+
+.form-checkbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+  font-size: 0.85rem;
+  color: var(--color-text-main);
+}
+.form-checkbox input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--color-primary);
+}
+
 /* ==========================================================================
-   2. INBOX LAYOUT & SIDEBAR
+   2. INBOX LAYOUT ET BARRE LATÉRALE
    ========================================================================== */
 
 .inbox-layout {
@@ -95,7 +165,7 @@
   overflow: hidden;
 }
 
-/* SLA Banner */
+/* Bannière d'alerte SLA */
 .sla-banner {
   background-color: #FEF2F2;
   border-bottom: 1px solid #FCA5A5;
@@ -109,7 +179,7 @@
 }
 .sla-banner.hidden { display: none; }
 
-/* Inbox Controls */
+/* Contrôles de filtres */
 .inbox-controls {
   padding: 0.85rem;
   border-bottom: 1px solid var(--color-border);
@@ -128,34 +198,23 @@
   position: absolute;
   left: 0.75rem;
   color: var(--color-text-muted);
-}
-.search-box input {
-  width: 100%;
-  padding: 0.5rem 0.75rem 0.5rem 2.25rem;
-  border: 1px solid var(--color-border);
-  border-radius: var(--radius-md);
-  font-family: inherit;
-  font-size: 0.85rem;
-  background-color: var(--color-bg);
-  outline: none;
-  transition: var(--transition-fast);
-}
-.search-box input:focus {
-  border-color: var(--color-primary);
-  background-color: var(--color-surface);
+  pointer-events: none;
 }
 
-/* Filter Chips */
+/* Puces de filtrage par canal */
 .filter-chips {
   display: flex;
   gap: 0.35rem;
   overflow-x: auto;
   padding-bottom: 2px;
+  scrollbar-width: none;
 }
+.filter-chips::-webkit-scrollbar { display: none; }
+
 .chip {
   background: var(--color-bg);
   border: 1px solid var(--color-border);
-  padding: 0.25rem 0.6rem;
+  padding: 0.25rem 0.65rem;
   border-radius: var(--radius-full);
   font-family: inherit;
   font-size: 0.725rem;
@@ -175,7 +234,7 @@
 .chip-ig.active { background-color: var(--color-ig); border-color: var(--color-ig); }
 .chip-urgent.active { background-color: var(--color-urgent); border-color: var(--color-urgent); }
 
-/* Status Tabs */
+/* Onglets de filtrage par statut */
 .status-tabs {
   display: flex;
   border-radius: var(--radius-md);
@@ -186,7 +245,7 @@
   flex: 1;
   border: none;
   background: none;
-  padding: 0.3rem 0.2rem;
+  padding: 0.35rem 0.2rem;
   font-family: inherit;
   font-size: 0.725rem;
   font-weight: 600;
@@ -201,17 +260,16 @@
   box-shadow: var(--shadow-sm);
 }
 
-/* Requests List */
+/* Liste défilante des cartes de demandes */
 .requests-list {
   flex: 1;
   overflow-y: auto;
-  padding: 0.5rem;
+  padding: 0.65rem;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.55rem;
 }
 
-/* Request Card */
 .request-card {
   background-color: var(--color-surface);
   border: 1px solid var(--color-border);
@@ -219,7 +277,6 @@
   padding: 0.85rem;
   cursor: pointer;
   transition: var(--transition-fast);
-  position: relative;
   display: flex;
   flex-direction: column;
   gap: 0.4rem;
@@ -251,28 +308,26 @@
   width: 22px;
   height: 22px;
   border-radius: 50%;
-  display: flex;
+  display: inline-flex;
   align-items: center;
   justify-content: center;
   font-size: 0.65rem;
   font-weight: 800;
   color: #fff;
 }
-.badge-wa { background-color: var(--color-wa); }
-.badge-fb { background-color: var(--color-fb); }
-.badge-ig { background-color: var(--color-ig); }
+.badge-whatsapp { background-color: var(--color-wa); }
+.badge-facebook { background-color: var(--color-fb); }
+.badge-instagram { background-color: var(--color-ig); }
 
 .customer-name {
   font-weight: 700;
   font-size: 0.875rem;
   color: var(--color-text-main);
 }
-
 .request-time {
   font-size: 0.725rem;
   color: var(--color-text-muted);
 }
-
 .card-preview {
   font-size: 0.8rem;
   color: var(--color-text-muted);
@@ -309,7 +364,7 @@
 }
 
 /* ==========================================================================
-   3. CHAT VIEW CONTAINER
+   3. VUE DE CONVERSATION ET CARTE IA
    ========================================================================== */
 
 .chat-container {
@@ -365,14 +420,15 @@
   gap: 0.5rem;
 }
 .status-select {
-  padding: 0.4rem 0.6rem;
+  padding: 0.45rem 0.75rem;
   border-radius: var(--radius-md);
   border: 1px solid var(--color-border);
   font-family: inherit;
   font-size: 0.8rem;
-  font-weight: 600;
+  font-weight: 700;
   background-color: var(--color-surface);
   cursor: pointer;
+  outline: none;
 }
 
 .chat-body {
@@ -384,7 +440,7 @@
   gap: 1rem;
 }
 
-/* Chat Message Bubbles */
+/* Bulles de conversation */
 .message-bubble {
   max-width: 80%;
   padding: 0.85rem 1.1rem;
@@ -407,7 +463,6 @@
   align-self: flex-end;
   border-bottom-right-radius: 2px;
 }
-
 .message-time {
   font-size: 0.675rem;
   opacity: 0.75;
@@ -416,7 +471,7 @@
   text-align: right;
 }
 
-/* Voice Message Player Box */
+/* Boîte du lecteur audio */
 .audio-player-box {
   display: flex;
   align-items: center;
@@ -443,22 +498,24 @@
   font-size: 0.825rem;
   font-style: italic;
   color: #166534;
-  background-color: rgba(255,255,255,0.7);
+  background-color: rgba(255,255,255,0.75);
   padding: 0.5rem 0.75rem;
   border-radius: var(--radius-sm);
   margin-top: 0.35rem;
   border-left: 3px solid var(--color-wa);
 }
 
-/* AI Suggested Response Section */
+/* Carte de Réponse Suggérée par IA */
 .ai-suggestion-card {
   background-color: var(--color-surface);
   border: 2px solid #FDBA74;
   border-radius: var(--radius-lg);
   padding: 1rem;
-  margin-top: auto;
+  margin: 0.75rem 1.25rem 1.25rem 1.25rem;
   box-shadow: var(--shadow-md);
+  transition: var(--transition-normal);
 }
+
 .ai-header {
   display: flex;
   align-items: center;
@@ -477,7 +534,7 @@
   font-size: 0.725rem;
   background-color: #FFEDD5;
   color: #9A3412;
-  padding: 0.15rem 0.45rem;
+  padding: 0.15rem 0.5rem;
   border-radius: var(--radius-full);
   font-weight: 700;
 }
@@ -505,9 +562,28 @@
   outline: none;
   line-height: 1.45;
 }
-.suggestion-textarea:focus {
-  border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(200, 90, 50, 0.15);
+
+/* État grisé une fois la réponse validée par l'agent */
+.ai-suggestion-card.validated {
+  background-color: #F9FAFB;
+  border-color: #E5E7EB;
+  opacity: 0.88;
+}
+.ai-suggestion-card.validated .suggestion-textarea {
+  background-color: #F3F4F6;
+  color: #6B7280;
+  pointer-events: none;
+}
+.ai-suggestion-card.validated .ai-title {
+  color: #059669;
+}
+.badge-validated {
+  background-color: #D1FAE5;
+  color: #065F46;
+  font-size: 0.725rem;
+  padding: 0.2rem 0.6rem;
+  border-radius: var(--radius-full);
+  font-weight: 700;
 }
 
 .ai-actions {
@@ -515,10 +591,77 @@
   align-items: center;
   justify-content: space-between;
   margin-top: 0.75rem;
+  gap: 0.5rem;
+  flex-wrap: wrap;
 }
 
 /* ==========================================================================
-   4. ANALYTICS DASHBOARD
+   4. PAGE CONFIGURATION ET PARAMÈTRES IA (REVISITÉ)
+   ========================================================================== */
+
+.settings-wrapper {
+  max-width: 780px;
+  width: 100%;
+  margin: 1.5rem auto;
+  padding: 0 1rem;
+  overflow-y: auto;
+}
+
+.settings-header {
+  margin-bottom: 1.5rem;
+}
+.settings-header h2 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--color-text-main);
+}
+.settings-intro {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-top: 0.25rem;
+}
+
+.settings-card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-sm);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-title-box {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  color: var(--color-primary);
+  margin-bottom: 0.5rem;
+}
+.card-title-box h3 {
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--color-text-main);
+}
+.card-desc {
+  font-size: 0.85rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1.5rem;
+  line-height: 1.45;
+}
+
+.form-actions {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--color-border);
+  flex-wrap: wrap;
+}
+
+/* ==========================================================================
+   5. TABLEAU DE BORD ANALYTICS ET MODALS
    ========================================================================== */
 
 .analytics-container {
@@ -531,7 +674,7 @@
 
 .analytics-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
   gap: 1rem;
   margin-bottom: 1.5rem;
 }
@@ -561,15 +704,9 @@
   font-size: 0.75rem;
   font-weight: 700;
   color: var(--color-low);
-  display: flex;
-  align-items: center;
-  gap: 0.2rem;
 }
 
-/* ==========================================================================
-   5. MODALS & DRAWERS
-   ========================================================================== */
-
+/* Overlay des Modals et Tiroirs */
 .drawer-overlay, .modal-overlay {
   position: fixed;
   top: 0; left: 0; right: 0; bottom: 0;
@@ -582,7 +719,6 @@
   pointer-events: none;
   transition: opacity 0.25s ease;
 }
-
 .drawer-overlay.active, .modal-overlay.active {
   opacity: 1;
   pointer-events: auto;
@@ -602,7 +738,6 @@
 .drawer-overlay.active .drawer-content {
   transform: translateX(0);
 }
-
 .drawer-header {
   padding: 1rem 1.25rem;
   border-bottom: 1px solid var(--color-border);
@@ -616,7 +751,6 @@
   gap: 0.5rem;
   color: var(--color-primary);
 }
-
 .drawer-body {
   padding: 1.25rem;
   overflow-y: auto;
@@ -650,7 +784,7 @@
   color: var(--color-primary);
 }
 
-/* Modal Catalog Specifics */
+/* Modal Catalogue */
 .modal-overlay {
   justify-content: center;
   align-items: center;
@@ -659,7 +793,7 @@
 .modal-content {
   background-color: var(--color-surface);
   border-radius: var(--radius-lg);
-  width: 720px;
+  width: 740px;
   max-width: 95vw;
   max-height: 85vh;
   display: flex;
@@ -683,7 +817,7 @@
 
 .catalog-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(210px, 1fr));
   gap: 1rem;
 }
 .catalog-item-card {
@@ -702,7 +836,7 @@
   border-radius: var(--radius-sm);
 }
 
-/* Toast Container */
+/* Notifications Toast */
 .toast-container {
   position: fixed;
   bottom: 1.5rem;

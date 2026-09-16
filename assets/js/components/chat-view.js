@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CITY ELEGANCE — CHAT VIEW COMPONENT (CONVERSATION, AUDIO & AI SUGGESTION)
+   CITY ELEGANCE — COMPOSANT CHAT (CONVERSATION, LECTEUR AUDIO & IA 1-CLIC)
    ========================================================================== */
 
 import { state } from '../state.js';
@@ -31,8 +31,12 @@ export function initChatView() {
       { val: 'perdu', label: '❌ Perdu' }
     ];
 
+    // Vérifier si la dernière réponse dans l'historique provient de l'agent (Déjà validé)
+    const hasAgentResponded = selectedReq.messagesHistory.some(m => m.sender === 'agent');
+    const isValidated = hasAgentResponded;
+
     chatContainer.innerHTML = `
-      <!-- Chat Header -->
+      <!-- En-tête de la conversation -->
       <div class="chat-header">
         <div class="chat-user-info">
           <img src="${selectedReq.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="Avatar" class="user-avatar">
@@ -57,47 +61,59 @@ export function initChatView() {
         </div>
       </div>
 
-      <!-- Chat Body Scroll Area -->
+      <!-- Corps défilant du fil de conversation -->
       <div class="chat-body" id="chat-messages-body">
         ${selectedReq.messagesHistory.map(msg => renderMessageBubble(msg)).join('')}
       </div>
 
-      <!-- AI Suggested Response Panel -->
-      <div class="ai-suggestion-card">
+      <!-- Carte de Réponse Suggérée par IA (Devient grisée une fois validée) -->
+      <div class="ai-suggestion-card ${isValidated ? 'validated' : ''}">
         <div class="ai-header">
           <div class="ai-title">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
-            <span>Réponse Suggérée par IA (Catalogue City Elegance)</span>
+            <span>${isValidated ? 'Réponse Envoyée au Client' : 'Réponse Suggérée par IA (Catalogue City Elegance)'}</span>
           </div>
-          <span class="ai-confidence">Confiance : ${Math.round((selectedReq.aiAnalysis?.confidenceScore || 0.95) * 100)}%</span>
+          
+          ${isValidated 
+            ? `<span class="badge-validated">✅ Réponse Envoyée</span>` 
+            : `<span class="ai-confidence">Confiance : ${Math.round((selectedReq.aiAnalysis?.confidenceScore || 0.95) * 100)}%</span>`
+          }
         </div>
 
         <div class="ai-intent-tag">
           💡 <strong>Intention détectée :</strong> ${escapeHTML(selectedReq.aiAnalysis?.intent || 'Demande d\'informations produit')}
         </div>
 
-        <textarea id="ai-response-input" class="suggestion-textarea" rows="3">${escapeHTML(selectedReq.aiAnalysis?.suggestedResponse || '')}</textarea>
+        <textarea id="ai-response-input" class="suggestion-textarea" rows="3" ${isValidated ? 'disabled' : ''}>${escapeHTML(selectedReq.aiAnalysis?.suggestedResponse || '')}</textarea>
 
         <div class="ai-actions">
-          <button id="btn-quick-catalog" class="btn btn-secondary btn-sm">
+          <button id="btn-quick-catalog" class="btn btn-secondary btn-sm" ${isValidated ? 'disabled style="opacity:0.5; pointer-events:none;"' : ''}>
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
             <span>Vérifier le Catalogue</span>
           </button>
 
-          <div style="display:flex; gap:0.5rem;">
-            <button id="btn-mark-converted" class="btn btn-success btn-sm">
-              <span>✅ Valider & Convertir Vente</span>
-            </button>
-            <button id="btn-send-response" class="btn btn-primary btn-sm">
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-              <span>Valider & Envoyer (1-Clic)</span>
-            </button>
+          <div style="display:flex; gap:0.5rem; flex-wrap:wrap;">
+            ${isValidated ? `
+              <!-- Bouton de retour en arrière (Annuler la dernière réponse) -->
+              <button id="btn-undo-response" class="btn btn-undo btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>
+                <span>↩️ Annuler la réponse (Retour arrière)</span>
+              </button>
+            ` : `
+              <button id="btn-mark-converted" class="btn btn-success btn-sm">
+                <span>✅ Valider & Convertir Vente</span>
+              </button>
+              <button id="btn-send-response" class="btn btn-primary btn-sm">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                <span>Valider & Envoyer (1-Clic)</span>
+              </button>
+            `}
           </div>
         </div>
       </div>
     `;
 
-    // Attach Event Handlers
+    // Attachement des gestionnaires d'événements
     attachChatViewEvents(selectedReq);
     scrollToBottom();
   }
@@ -137,7 +153,7 @@ export function initChatView() {
   }
 
   function attachChatViewEvents(selectedReq) {
-    // Status Change Header
+    // Changement de statut du pipeline depuis le dropdown
     const statusSelect = document.getElementById('status-select-header');
     if (statusSelect) {
       statusSelect.addEventListener('change', (e) => {
@@ -146,7 +162,7 @@ export function initChatView() {
       });
     }
 
-    // Audio Play Buttons
+    // Boutons de lecture audio
     document.querySelectorAll('.audio-play-btn').forEach(btn => {
       btn.addEventListener('click', () => {
         btn.textContent = '⏸';
@@ -164,7 +180,7 @@ export function initChatView() {
       });
     });
 
-    // Send Response (1-click)
+    // Validation et envoi de la réponse en 1 clic
     const btnSend = document.getElementById('btn-send-response');
     const responseInput = document.getElementById('ai-response-input');
 
@@ -173,11 +189,11 @@ export function initChatView() {
         const text = responseInput.value.trim();
         if (!text) return;
         state.addAgentResponse(selectedReq.id, text);
-        showToast("Réponse envoyée au client en 1 clic ! 🚀");
+        showToast("Réponse envoyée au client ! Option grisée. 🚀");
       });
     }
 
-    // Mark Converted
+    // Validation et conversion en vente réalisée
     const btnConverted = document.getElementById('btn-mark-converted');
     if (btnConverted && responseInput) {
       btnConverted.addEventListener('click', () => {
@@ -190,7 +206,16 @@ export function initChatView() {
       });
     }
 
-    // Open Catalog Lookup Modal
+    // Bouton de Retour en arrière (Annuler la dernière réponse)
+    const btnUndo = document.getElementById('btn-undo-response');
+    if (btnUndo) {
+      btnUndo.addEventListener('click', () => {
+        state.removeLastAgentResponse(selectedReq.id);
+        showToast("Dernière réponse annulée ! Vous pouvez de nouveau modifier le texte. ↩️");
+      });
+    }
+
+    // Ouverture du modal de recherche catalogue
     const btnCatalog = document.getElementById('btn-quick-catalog');
     if (btnCatalog) {
       btnCatalog.addEventListener('click', () => {
@@ -204,7 +229,7 @@ export function initChatView() {
     if (body) body.scrollTop = body.scrollHeight;
   }
 
-  // Subscribe to state events
+  // Abonnement aux événements du store
   state.addEventListener('state-changed', renderChat);
   renderChat();
 }
@@ -216,7 +241,7 @@ function showToast(message) {
   toast.className = 'toast';
   toast.textContent = message;
   container.appendChild(toast);
-  setTimeout(() => toast.remove(), 3000);
+  setTimeout(() => toast.remove(), 3200);
 }
 
 function escapeHTML(str) {

@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CITY ELEGANCE — CENTRAL REACTIVE STATE STORE
+   CITY ELEGANCE — STORE DE DONNÉES CENTRALISÉ ET RÉACTIF
    ========================================================================== */
 
 import { StorageService } from './services/storage-service.js';
@@ -22,13 +22,14 @@ class StateStore extends EventTarget {
     this.loadState();
   }
 
+  // Chargement de l'état initial depuis le localStorage
   loadState() {
     this.requests = StorageService.getRequests();
     this.catalog = StorageService.getCatalog();
     this.customers = StorageService.getCustomers();
     this.settings = StorageService.getSettings();
 
-    // Auto calculate SLA overdue status (> 30 mins unanswered nouveau)
+    // Calcul automatique du dépasser de délai SLA (> 30 min sans réponse pour un nouveau message)
     this.updateSLAStatus();
 
     if (this.requests.length > 0 && !this.selectedRequestId) {
@@ -36,6 +37,7 @@ class StateStore extends EventTarget {
     }
   }
 
+  // Recalcul des alertes SLA en fonction de l'horodatage actuel
   updateSLAStatus() {
     const now = new Date().getTime();
     this.requests.forEach(req => {
@@ -49,13 +51,14 @@ class StateStore extends EventTarget {
     });
   }
 
+  // Notification des composants suite à un changement d'état
   notifyChange() {
     this.updateSLAStatus();
     StorageService.saveRequests(this.requests);
     this.dispatchEvent(new CustomEvent('state-changed', { detail: this }));
   }
 
-  // State Mutators
+  // Mutateurs d'état
   setSelectedRequestId(id) {
     this.selectedRequestId = id;
     this.notifyChange();
@@ -72,7 +75,7 @@ class StateStore extends EventTarget {
   }
 
   addRequest(newRequest) {
-    this.requests.unshift(newRequest); // Add to top of list
+    this.requests.unshift(newRequest); // Ajouter en tête de liste
     this.selectedRequestId = newRequest.id;
     this.notifyChange();
   }
@@ -85,6 +88,7 @@ class StateStore extends EventTarget {
     }
   }
 
+  // Ajouter une réponse de l'agent dans l'historique
   addAgentResponse(requestId, responseText) {
     const req = this.requests.find(r => r.id === requestId);
     if (req) {
@@ -100,21 +104,46 @@ class StateStore extends EventTarget {
     }
   }
 
+  // Annuler et supprimer la dernière réponse envoyée par l'agent (Retour en arrière)
+  removeLastAgentResponse(requestId) {
+    const req = this.requests.find(r => r.id === requestId);
+    if (req && req.messagesHistory.length > 0) {
+      // Trouver l'indice du dernier message agent
+      const lastAgentIdx = req.messagesHistory.map(m => m.sender).lastIndexOf('agent');
+      if (lastAgentIdx !== -1) {
+        req.messagesHistory.splice(lastAgentIdx, 1);
+        
+        // Mettre à jour le dernier message affiché
+        const remainingMsgs = req.messagesHistory;
+        req.lastMessage = remainingMsgs.length > 0 ? remainingMsgs[remainingMsgs.length - 1].text : '';
+        
+        // Si aucun message agent n'est présent, repasser le statut à "nouveau"
+        const hasAgentMsg = remainingMsgs.some(m => m.sender === 'agent');
+        if (!hasAgentMsg) {
+          req.status = 'nouveau';
+        }
+        
+        this.notifyChange();
+      }
+    }
+  }
+
+  // Filtrage dynamique des demandes clients
   getFilteredRequests() {
     return this.requests.filter(req => {
-      // Channel Filter
+      // Filtre par canal
       if (this.filters.channel !== 'all' && req.channel !== this.filters.channel) {
         return false;
       }
-      // Status Filter
+      // Filtre par statut pipeline
       if (this.filters.status !== 'all' && req.status !== this.filters.status) {
         return false;
       }
-      // Urgency Filter
+      // Filtre par urgence
       if (this.filters.urgency === 'high' && (req.urgencyLevel !== 'haute' && req.urgencyLevel !== 'critique')) {
         return false;
       }
-      // Search Query
+      // Recherche textuelle
       if (this.filters.searchQuery.trim() !== '') {
         const query = this.filters.searchQuery.toLowerCase();
         const matchName = req.customerName.toLowerCase().includes(query);

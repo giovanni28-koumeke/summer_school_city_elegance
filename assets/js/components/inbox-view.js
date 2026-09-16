@@ -1,5 +1,5 @@
 /* ==========================================================================
-   CITY ELEGANCE — INBOX VIEW COMPONENT (REQUESTS LIST, FILTERS & SLA)
+   CITY ELEGANCE — COMPOSANT VUE INBOX (LISTE DES DEMANDES, FILTRES ET SLA)
    ========================================================================== */
 
 import { state } from '../state.js';
@@ -15,16 +15,16 @@ export function initInboxView() {
 
   if (!requestsListContainer) return;
 
-  // Render Requests List
+  // Génération et rendu de la liste des demandes clients
   function renderList() {
     const filtered = state.getFilteredRequests();
     const allRequests = state.requests;
 
-    // Update unread / new count
+    // Mise à jour du compteur de nouveaux messages non lus
     const newCount = allRequests.filter(r => r.status === 'nouveau').length;
     unreadBadge.textContent = newCount;
 
-    // Update SLA Overdue Banner
+    // Mise à jour de la bannière d'alerte SLA (> 30 min sans réponse)
     const slaOverdueCount = allRequests.filter(r => r.slaOverdue).length;
     if (slaOverdueCount > 0) {
       slaBanner.classList.remove('hidden');
@@ -76,7 +76,7 @@ export function initInboxView() {
       `;
     }).join('');
 
-    // Attach card click handlers
+    // Gestion de la sélection d'une carte au clic
     document.querySelectorAll('.request-card').forEach(card => {
       card.addEventListener('click', () => {
         const id = card.getAttribute('data-id');
@@ -85,7 +85,7 @@ export function initInboxView() {
     });
   }
 
-  // Event Listeners for Filters
+  // Écouteurs d'événements pour la recherche et les filtres
   searchInput.addEventListener('input', (e) => {
     state.setFilter('searchQuery', e.target.value);
   });
@@ -117,14 +117,14 @@ export function initInboxView() {
     });
   });
 
-  // Listen to state changes
+  // Abonnement aux changements du store réactif
   state.addEventListener('state-changed', renderList);
 
-  // Initial render
+  // Rendu initial
   renderList();
 }
 
-// Helpers
+// Utilitaires de formatage de la date et des étiquettes
 function formatTime(isoString) {
   if (!isoString) return '';
   const date = new Date(isoString);

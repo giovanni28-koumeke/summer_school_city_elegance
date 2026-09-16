@@ -1,13 +1,14 @@
 /* ==========================================================================
-   CITY ELEGANCE — SPEECH SERVICE (WEB SPEECH API & AUDIO TRANSCRIPTION)
+   CITY ELEGANCE — SERVICE AUDIO ET SPEECH (TRANSCRIPTION WEB SPEECH API)
    ========================================================================== */
 
 export const SpeechService = {
+  // Vérifie si la Web Speech API est supportée par le navigateur
   isSupported() {
     return 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
   },
 
-  // Simulates playing a voice note with audio wave animation
+  // Simule la lecture d'une note vocale avec barre de progression
   playAudioNote(audioUrl, onProgress, onEnd) {
     let progress = 0;
     const interval = setInterval(() => {
@@ -28,16 +29,16 @@ export const SpeechService = {
     };
   },
 
-  // Real Web Speech API transcription or simulated high quality voice transcription
+  // Transcription en temps réel d'un flux audio via l'API Web Speech ou fallback
   transcribeAudioBlob(audioBlobOrText) {
     return new Promise((resolve) => {
-      // If text transcript is already provided in payload
+      // Si la transcription textuelle est déjà fournie
       if (typeof audioBlobOrText === 'string') {
         setTimeout(() => resolve(audioBlobOrText), 600);
         return;
       }
 
-      // If real browser SpeechRecognition is available
+      // Si l'API Web Speech du navigateur est disponible
       const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
       if (SpeechRecognition) {
         try {
@@ -58,11 +59,11 @@ export const SpeechService = {
           recognition.start();
           return;
         } catch (e) {
-          // Fallback if mic permission is denied
+          // Fallback si la permission du micro est refusée
         }
       }
 
-      // Default fallback transcript
+      // Transcription par défaut si pas d'API navigateur
       setTimeout(() => {
         resolve("Bonjour City Elegance, s'il vous plaît je voudrais savoir si la robe wax est disponible et les frais de livraison vers Bè.");
       }, 800);
