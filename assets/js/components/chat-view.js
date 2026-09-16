@@ -39,6 +39,10 @@ export function initChatView() {
       <!-- En-tête de la conversation -->
       <div class="chat-header">
         <div class="chat-user-info">
+          <button id="btn-back-to-inbox" class="btn btn-secondary btn-sm btn-back-inbox" title="Retour aux demandes">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+            <span>Demandes</span>
+          </button>
           <img src="${selectedReq.avatar || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150'}" alt="Avatar" class="user-avatar">
           <div class="user-details">
             <h3>${escapeHTML(selectedReq.customerName)}</h3>
@@ -153,6 +157,14 @@ export function initChatView() {
   }
 
   function attachChatViewEvents(selectedReq) {
+    // Bouton de Retour à la Liste des Demandes (Navigation 2 Écrans Style WhatsApp)
+    const btnBack = document.getElementById('btn-back-to-inbox');
+    if (btnBack) {
+      btnBack.addEventListener('click', () => {
+        window.location.hash = '#/inbox';
+      });
+    }
+
     // Changement de statut du pipeline depuis le dropdown
     const statusSelect = document.getElementById('status-select-header');
     if (statusSelect) {

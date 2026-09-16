@@ -76,11 +76,12 @@ export function initInboxView() {
       `;
     }).join('');
 
-    // Gestion de la sélection d'une carte au clic
+    // Gestion de la sélection d'une carte au clic (Mise à jour du hash URL #/chat/id)
     document.querySelectorAll('.request-card').forEach(card => {
       card.addEventListener('click', () => {
         const id = card.getAttribute('data-id');
         state.setSelectedRequestId(id);
+        window.location.hash = `#/chat/${id}`;
       });
     });
   }

@@ -53,6 +53,7 @@ export function initBurgerMenu() {
 
       if (viewTarget) {
         state.setActiveView(viewTarget);
+        window.location.hash = `#/${viewTarget}`;
         closeMenu();
       } else if (isAction === 'logout') {
         closeMenu();

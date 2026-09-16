@@ -110,6 +110,11 @@ class StateStore extends EventTarget {
     this.notifyChange();
   }
 
+  clearSelectedRequest() {
+    this.selectedRequestId = null;
+    this.notifyChange();
+  }
+
   setActiveView(viewName) {
     this.activeView = viewName;
     this.dispatchEvent(new CustomEvent('view-changed', { detail: { view: viewName } }));

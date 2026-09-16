@@ -68,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 5. Bascule dynamique des vues selon state.activeView
+  // 5. Bascule dynamique des vues selon state.activeView & Routeur Hash (#/inbox, #/chat/id)
   const viewSections = document.querySelectorAll('.view-section');
   state.addEventListener('view-changed', (e) => {
     const activeView = e.detail.view;
@@ -81,12 +81,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Gestion du routeur par Hash URL (#/inbox, #/chat/req_001, etc.)
+  function handleHashChange() {
+    const hash = window.location.hash || '#/inbox';
+    const inboxLayout = document.querySelector('.inbox-layout');
+
+    if (hash.startsWith('#/chat/')) {
+      const reqId = hash.replace('#/chat/', '').trim();
+      if (reqId) {
+        state.selectedRequestId = reqId;
+      }
+      state.setActiveView('inbox');
+      if (inboxLayout) {
+        inboxLayout.classList.add('chat-active');
+      }
+    } else {
+      if (inboxLayout) {
+        inboxLayout.classList.remove('chat-active');
+      }
+      if (hash === '#/inbox') {
+        state.setActiveView('inbox');
+      } else if (hash === '#/analytics') {
+        state.setActiveView('analytics');
+      } else if (hash === '#/profile') {
+        state.setActiveView('profile');
+      } else if (hash === '#/settings') {
+        state.setActiveView('settings');
+      }
+    }
+  }
+
+  window.addEventListener('hashchange', handleHashChange);
+  
   // Écouter les changements d'état global
   state.addEventListener('state-changed', updateAuthUI);
   
-  // Forcer la notification initiale pour remplir l'inbox et activer les réactivités des boutons
+  // Forcer la notification initiale et la synchronisation du hash
   state.notifyChange();
   updateAuthUI();
+  handleHashChange();
 
   // 6. Configuration de l'API IA
   const apiKeyInput = document.getElementById('api-key-input');
