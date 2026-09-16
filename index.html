@@ -322,18 +322,81 @@
     </div>
   </div>
 
-  <!-- MODAL : RECHERCHE RAPIDE CATALOGUE POUR L'AGENT -->
+  <!-- MODAL : CATALOGUE PRODUITS ET GESTION PME -->
   <div id="catalog-modal" class="modal-overlay">
     <div class="modal-content">
       <div class="modal-header">
-        <h3>Catalogue Produits de l'Entreprise</h3>
+        <div style="display:flex; align-items:center; gap:0.75rem;">
+          <h3>Catalogue Produits de l'Entreprise</h3>
+          <button id="btn-toggle-add-product" class="btn btn-primary btn-sm">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            <span>+ Ajouter un produit</span>
+          </button>
+        </div>
         <button id="btn-close-catalog" class="btn-icon">&times;</button>
       </div>
+
       <div class="modal-body">
-        <div class="search-box">
+        <!-- Formulaire d'Ajout / Édition de Produit (Caché par défaut) -->
+        <div id="product-form-container" class="product-form-card hidden" style="background:var(--color-bg); border:1px solid var(--color-border); border-radius:var(--radius-md); padding:1rem; margin-bottom:1rem;">
+          <h4 id="product-form-title" style="font-size:0.95rem; font-weight:800; margin-bottom:0.75rem; color:var(--color-primary);">Ajouter un nouveau produit au catalogue</h4>
+          
+          <form id="product-form">
+            <input type="hidden" id="prod-edit-id" value="">
+            
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label for="prod-name">Nom du Produit *</label>
+                <input type="text" id="prod-name" class="form-control" placeholder="Ex: Robe Wax Africaine" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label for="prod-category">Catégorie</label>
+                <select id="prod-category" class="form-control">
+                  <option value="habits">Prêt-à-porter & Habits 👗</option>
+                  <option value="chaussures">Chaussures & Talons 👠</option>
+                  <option value="accessoires">Sacs & Accessoires 👜</option>
+                  <option value="autre">Autre produit 📦</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label for="prod-price">Prix (FCFA) *</label>
+                <input type="number" id="prod-price" class="form-control" placeholder="18500" required>
+              </div>
+
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label for="prod-sizes">Tailles / Pointures (séparées par virgule)</label>
+                <input type="text" id="prod-sizes" class="form-control" placeholder="Ex: S, M, L, XL ou 38, 39, 40">
+              </div>
+            </div>
+
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:0.75rem;">
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label for="prod-delivery">Délai de Livraison</label>
+                <input type="text" id="prod-delivery" class="form-control" value="24h à Lomé (1000 FCFA)">
+              </div>
+
+              <div class="form-group" style="margin-bottom:0.5rem;">
+                <label for="prod-image">URL de l'Image (Optionnel)</label>
+                <input type="url" id="prod-image" class="form-control" placeholder="https://...">
+              </div>
+            </div>
+
+            <div style="display:flex; justify-content:flex-end; gap:0.5rem; margin-top:0.75rem;">
+              <button type="button" id="btn-cancel-product-form" class="btn btn-secondary btn-sm">Annuler</button>
+              <button type="submit" id="btn-save-product-form" class="btn btn-primary btn-sm">Enregistrer le Produit</button>
+            </div>
+          </form>
+        </div>
+
+        <div class="search-box" style="margin-bottom: 0.85rem;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
           <input type="text" id="catalog-search-input" placeholder="Filtrer articles, catégories, prix, variantes...">
         </div>
+
         <div id="catalog-grid" class="catalog-grid">
           <!-- Rendu dynamique par catalog-modal.js -->
         </div>

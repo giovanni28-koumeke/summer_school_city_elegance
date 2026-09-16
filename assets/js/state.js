@@ -199,6 +199,61 @@ class StateStore extends EventTarget {
   getSelectedRequest() {
     return this.requests.find(r => r.id === this.selectedRequestId) || null;
   }
+
+  // Operations CRUD sur le catalogue produits de l'entreprise
+  addProduct(prodData) {
+    const rawSizes = typeof prodData.sizes === 'string' ? prodData.sizes.split(',') : (Array.isArray(prodData.sizes) ? prodData.sizes : []);
+    const sizes = rawSizes.map(s => s.trim()).filter(Boolean);
+    const finalSizes = sizes.length > 0 ? sizes : ['Taille Unique'];
+
+    const stockObj = {};
+    finalSizes.forEach(sz => { stockObj[sz] = 5; });
+
+    const newProd = {
+      id: `prod_${Date.now()}`,
+      name: prodData.name.trim(),
+      category: prodData.category || 'habits',
+      priceXOF: parseInt(prodData.priceXOF, 10) || 0,
+      sizes: finalSizes,
+      stock: stockObj,
+      deliveryDelay: prodData.deliveryDelay || '24h à Lomé (1000 FCFA)',
+      image: prodData.image || 'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=300'
+    };
+
+    this.catalog.unshift(newProd);
+    this.notifyChange();
+    return newProd;
+  }
+
+  updateProduct(id, prodData) {
+    const prod = this.catalog.find(p => p.id === id);
+    if (prod) {
+      if (prodData.name) prod.name = prodData.name.trim();
+      if (prodData.category) prod.category = prodData.category;
+      if (prodData.priceXOF !== undefined && prodData.priceXOF !== '') {
+        prod.priceXOF = parseInt(prodData.priceXOF, 10) || 0;
+      }
+      if (prodData.sizes !== undefined) {
+        const rawSizes = typeof prodData.sizes === 'string' ? prodData.sizes.split(',') : (Array.isArray(prodData.sizes) ? prodData.sizes : []);
+        const sizes = rawSizes.map(s => s.trim()).filter(Boolean);
+        prod.sizes = sizes.length > 0 ? sizes : ['Taille Unique'];
+        const stockObj = {};
+        prod.sizes.forEach(sz => { stockObj[sz] = (prod.stock && prod.stock[sz]) || 5; });
+        prod.stock = stockObj;
+      }
+      if (prodData.deliveryDelay) prod.deliveryDelay = prodData.deliveryDelay;
+      if (prodData.image) prod.image = prodData.image;
+      this.notifyChange();
+    }
+  }
+
+  deleteProduct(id) {
+    const idx = this.catalog.findIndex(p => p.id === id);
+    if (idx !== -1) {
+      this.catalog.splice(idx, 1);
+      this.notifyChange();
+    }
+  }
 }
 
 export const state = new StateStore();
