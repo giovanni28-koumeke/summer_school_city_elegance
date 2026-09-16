@@ -56,7 +56,7 @@ Format de réponse OBLIGATOIRE : Tu dois répondre UNIQUEMENT par un objet JSON 
         'Content-Type': 'application/json',
         'x-api-key': apiKey,
         'anthropic-version': '2023-06-01',
-        'dangerously-allow-browser': 'true'
+        'anthropic-dangerous-direct-browser-access': 'true'
       },
       body: JSON.stringify({
         model: model || 'claude-3-5-sonnet-20241022',
